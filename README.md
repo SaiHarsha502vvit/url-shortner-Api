@@ -1,4 +1,4 @@
-This project is a URL shortener service built with Node.js, Express, and MongoDB. Here's a brief overview of the main components:
+# This project is a URL shortener service built with Node.js, Express, and MongoDB. Here's a brief overview of the main components:
 
 The entry point of the application is index.js. It sets up an Express server, connects to MongoDB using the connectToMongoDB function from connect.js, and defines the routes for the application.
 
@@ -18,4 +18,4 @@ The application also has a route /:id in index.js which is used to redirect shor
 
 To run the project in development mode, use the dev script defined in the package.json file:
 
-npm run dev
+- npm run dev
