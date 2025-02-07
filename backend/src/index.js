@@ -11,6 +11,8 @@ import connectToDatabase from './config/db.config.js';
 import cors from 'cors'
 dotenv.config();
 const app = express();
+
+// for testing purpose
 app.set('trust proxy', 1);
 const PORT = appConfig.PORT || 5000;
 
