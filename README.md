@@ -245,7 +245,7 @@ Send a POST request to [http://localhost:5000/api/auth/login](http://localhost:5
 
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTVmNmZkODc2ZDNmNjQ0NDA2YjMxNCIsImlhdCI6MTczODkzMDEyNSwiZXhwIjoxNzM4OTMzNzI1fQ.o0esIK1vgLsO83zr_k2ddZ3UifzGrIZOo5VDJpbRXJc"
+  "token": "<Auth_Token>"
 }
 ```
 
@@ -263,7 +263,7 @@ Send a POST request to `http://localhost:5000/api/urls` with a JSON payload. For
 
 ```json
 {
-  "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTVmNmZkODc2ZDNmNjQ0NDA2YjMxNCIsImlhdCI6MTczODkzMDEyNSwiZXhwIjoxNzM4OTMzNzI1fQ.o0esIK1vgLsO83zr_k2ddZ3UifzGrIZOo5VDJpbRXJc"
+  "Authorization": "Bearer <Auth_Token>"
 }
 ```
 
@@ -307,7 +307,7 @@ When you visit [http://localhost:5000/api/urls/example](http://localhost:5000/ap
   Include your JWT token in the Authorization header:
 
   ```
-  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3YTVmNmZkODc2ZDNmNjQ0NDA2YjMxNCIsImlhdCI6MTczODkzMDEyNSwiZXhwIjoxNzM4OTMzNzI1fQ.o0esIK1vgLsO83zr_k2ddZ3UifzGrIZOo5VDJpbRXJc
+  Authorization: Bearer <Auth_Token>
   ```
 
 - **Sample Response:**
