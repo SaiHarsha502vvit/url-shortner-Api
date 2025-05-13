@@ -9,7 +9,6 @@ import UrlList from './components/UrlList';
 import type { UrlItem } from './components/UrlList';
 import AnalyticsModal from './components/AnalyticsModal';
 import { register, login, shortenUrl, getAnalytics, updateUrl, deleteUrl, getUrlAnalytics } from './services/api';
-import type { AxiosError } from 'axios';
 import ShortUrlCard from './components/ShortUrlCard';
 import Hero from './components/Hero';
 
@@ -47,8 +46,8 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setUrlsError(axiosErr.response?.data?.message || 'Failed to update URL');
+        const axiosErr = err as any;
+        setUrlsError(axiosErr?.response?.data?.message || 'Failed to update URL');
       } else {
         setUrlsError('Failed to update URL');
       }
@@ -69,8 +68,8 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setUrlsError(axiosErr.response?.data?.message || 'Failed to delete URL');
+        const axiosErr = err as any;
+        setUrlsError(axiosErr?.response?.data?.message || 'Failed to delete URL');
       } else {
         setUrlsError('Failed to delete URL');
       }
@@ -100,8 +99,8 @@ const App: React.FC = () => {
       setModalClickHistory(data.clickHistory || []);
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setModalError(axiosErr.response?.data?.message || 'Failed to load analytics');
+        const axiosErr = err as any;
+        setModalError(axiosErr?.response?.data?.message || 'Failed to load analytics');
       } else {
         setModalError('Failed to load analytics');
       }
@@ -130,8 +129,8 @@ const App: React.FC = () => {
       setUrls(data.map((item) => ({ ...item, _id: item.shortId })));
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setUrlsError(axiosErr.response?.data?.message || 'Failed to load URLs');
+        const axiosErr = err as any;
+        setUrlsError(axiosErr?.response?.data?.message || 'Failed to load URLs');
       } else {
         setUrlsError('Failed to load URLs');
       }
@@ -187,8 +186,8 @@ const App: React.FC = () => {
       }
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setAuthError(axiosErr.response?.data?.message || 'Authentication failed');
+        const axiosErr = err as any;
+        setAuthError(axiosErr?.response?.data?.message || 'Authentication failed');
       } else {
         setAuthError('Authentication failed');
       }
@@ -212,8 +211,8 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setShortenError(axiosErr.response?.data?.message || 'Failed to shorten URL');
+        const axiosErr = err as any;
+        setShortenError(axiosErr?.response?.data?.message || 'Failed to shorten URL');
       } else {
         setShortenError('Failed to shorten URL');
       }

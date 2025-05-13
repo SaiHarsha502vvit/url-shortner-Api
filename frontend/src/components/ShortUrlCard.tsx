@@ -23,7 +23,8 @@ const ShortUrlCard: React.FC<ShortUrlCardProps> = ({ shortId, originalUrl }) => 
   const handleShowQR = async () => {
     setLoading(true);
     const res = await getQRCode(shortId);
-    setQr(res.data.qrCode);
+    // Type assertion to specify the expected structure of res.data
+    setQr((res.data as { qrCode: string }).qrCode);
     setLoading(false);
   };
 
