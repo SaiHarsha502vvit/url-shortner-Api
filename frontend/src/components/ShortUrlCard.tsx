@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { getQRCode } from '../services/api';
 
+const API_BASE = import.meta.env.VITE_API_URL;
 interface ShortUrlCardProps {
   shortId: string;
   originalUrl: string;
@@ -12,7 +13,7 @@ const ShortUrlCard: React.FC<ShortUrlCardProps> = ({ shortId, originalUrl }) => 
   const [qr, setQr] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const shortUrl = `http://localhost:5000/api/urls/${shortId}`;
+const shortUrl = `${API_BASE}/urls/${shortId}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl);
