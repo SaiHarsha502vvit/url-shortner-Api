@@ -23,10 +23,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center text-white drop-shadow-lg">{isLogin ? 'Login' : 'Register'}</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-black drop-shadow-lg">{isLogin ? 'Login' : 'Register'}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-black text-white placeholder-gray-400"
+          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-white text-black placeholder-gray-400"
           type="text"
           placeholder="Username"
           value={username}
