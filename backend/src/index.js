@@ -19,7 +19,7 @@ const PORT = appConfig.PORT || 5000;
 app.use(cors({
     origin: [
       /^http:\/\/localhost:\d+$/,
-      "https://your-netlify-site.netlify.app" // <-- replace with your actual Netlify domain
+      "https://live-url-shortner.netlify.app/" // <-- replace with your actual Netlify domain
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // If using cookies or authorization headers
