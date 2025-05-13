@@ -64,7 +64,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ analytics, load
                     className="hover:bg-gray-800 transition-colors duration-200"
                   >
                     <td className="p-3 text-red-400 underline">
-                      <a href={`http://localhost:5000/api/urls/${item.shortId}`} target="_blank" rel="noopener noreferrer">
+                      <a href={`${import.meta.env.VITE_API_URL}/urls/${item.shortId}`} target="_blank" rel="noopener noreferrer">
                         {item.shortId}
                       </a>
                     </td>

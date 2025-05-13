@@ -110,7 +110,7 @@ export const getQRCode = async (req, res) => {
         if (!urlEntry) {
             return res.status(404).json({ message: 'Short URL not found' });
         }
-        const shortUrl = `http://localhost:5000/api/urls/${urlEntry.shortId}`;
+        const shortUrl = `https://url-shortner-api-backend.onrender.com/api/urls/${urlEntry.shortId}`;
         const qrDataUrl = await QRCode.toDataURL(shortUrl);
         res.status(200).json({ qrCode: qrDataUrl });
     } catch (error) {

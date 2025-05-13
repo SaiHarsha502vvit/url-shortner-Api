@@ -89,8 +89,6 @@ Ensure you have the following installed on your machine:
 
 3. **Access the Application**
 
-   Open your browser and navigate to:  
-   [http://localhost:5000](http://localhost:5000)
 
 ---
 
@@ -195,7 +193,7 @@ This section explains in detail how the authorization and login components work 
 
      ### Example: User Registration
 
-You can register a new user by sending a POST request to [http://localhost:5000/api/auth/register](http://localhost:5000/api/auth/register) with the following JSON payload:
+You can register a new user by sending a POST request to [https://url-shortner-api-backend.onrender.com/api/auth/register](https://url-shortner-api-backend.onrender.com/api/auth/register) with the following JSON payload:
 
 ```json
 {
@@ -232,7 +230,7 @@ You can register a new user by sending a POST request to [http://localhost:5000/
 
 #### Example: User Login
 
-Send a POST request to [http://localhost:5000/api/auth/login](http://localhost:5000/api/auth/login) with the following JSON payload:
+Send a POST request to [https://url-shortner-api-backend.onrender.com/api/auth/login](https://url-shortner-api-backend.onrender.com/api/auth/login) with the following JSON payload:
 
 ```json
 {
@@ -257,7 +255,7 @@ Authorization: Bearer your_jwt_token_here
 
 ### Create a Shortened URL
 
-Send a POST request to `http://localhost:5000/api/urls` with a JSON payload. For example:
+Send a POST request to `https://url-shortner-api-backend.onrender.com/api/urls` with a JSON payload. For example:
 
 **Headers**
 
@@ -294,14 +292,14 @@ Send a POST request to `http://localhost:5000/api/urls` with a JSON payload. For
 
 ## How Redirection Works
 
-When you visit [http://localhost:5000/api/urls/example](http://localhost:5000/api/urls/example), the application looks up the "example" alias. It then retrieves the original URL associated with that alias, in this case, **https://example.com/**, and responds with a redirection. This means your browser is automatically forwarded to the original URL without further action on your part. The redirection is typically handled with an HTTP 302 status code, although implementations may vary.
+When you visit [https://url-shortner-api-backend.onrender.com/api/urls/example](https://url-shortner-api-backend.onrender.com/api/urls/example), the application looks up the "example" alias. It then retrieves the original URL associated with that alias, in this case, **https://example.com/**, and responds with a redirection. This means your browser is automatically forwarded to the original URL without further action on your part. The redirection is typically handled with an HTTP 302 status code, although implementations may vary.
 
 ## Analytics Routes
 
 ### Retrieve Click Statistics
 
 - **Endpoint:**  
-  GET [http://localhost:5000/api/analytics](http://localhost:5000/api/analytics)
+  GET [https://url-shortner-api-backend.onrender.com/api/analytics](https://url-shortner-api-backend.onrender.com/api/analytics)
 
 - **Headers:**  
   Include your JWT token in the Authorization header:
