@@ -17,12 +17,19 @@ app.set('trust proxy', 1);
 const PORT = appConfig.PORT || 5000;
 
 app.use(cors({
-    origin: [
-      /^http:\/\/localhost:\d+$/,
-      "https://live-url-shortner.netlify.app/" // <-- replace with your actual Netlify domain
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true, // If using cookies or authorization headers
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (
+      /^http:\/\/localhost:\d+$/.test(origin) ||
+      origin === "https://live-url-shortner.netlify.app"
+    ) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
 }));
   
 app.use(express.json());
