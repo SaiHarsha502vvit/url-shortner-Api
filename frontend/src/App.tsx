@@ -80,7 +80,7 @@ const App: React.FC = () => {
 
   // Copy short URL
   const handleCopy = (shortId: string) => {
-    const url = `http://localhost:5000/api/urls/${shortId}`;
+    const url = `${import.meta.env.VITE_API_URL}/urls/${shortId}`; // Use VITE_API_URL
     navigator.clipboard.writeText(url);
     setSuccessMsg('Short URL copied to clipboard!');
   };
