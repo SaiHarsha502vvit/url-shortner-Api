@@ -23,10 +23,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
 
   return (
     <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center">{isLogin ? 'Login' : 'Register'}</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center text-white drop-shadow-lg">{isLogin ? 'Login' : 'Register'}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring"
+          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-black text-white placeholder-gray-400"
           type="text"
           placeholder="Username"
           value={username}
@@ -35,15 +35,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
         />
         {!isLogin && (
           <input required
-            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring"
+            className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-white text-black placeholder-gray-400"
             type="email"
             placeholder="Email "
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
         )}
-        <input 
-          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring"
+        <input
+          className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-white text-black placeholder-gray-400"
           type="password"
           placeholder="Password"
           value={password}
@@ -52,7 +52,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
         />
         {error && <div className="text-red-500 text-sm">{error}</div>}
         <button
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition font-bold shadow-lg"
           type="submit"
           disabled={loading}
         >

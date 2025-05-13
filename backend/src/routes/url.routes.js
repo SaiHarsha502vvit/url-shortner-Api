@@ -1,5 +1,5 @@
 import express from 'express';
-import { createShortUrl, getOriginalUrl, deleteShortLink, updateShortUrl } from '../controllers/url.controller.js';
+import { createShortUrl, getOriginalUrl, deleteShortLink, updateShortUrl, getQRCode } from '../controllers/url.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import rateLimiter from '../middlewares/rateLimiter.middleware.js';
 
@@ -10,6 +10,9 @@ router.post('/', authMiddleware, rateLimiter, createShortUrl);
 
 // Route to retrieve the original URL from a short link
 router.get('/:id', getOriginalUrl);
+
+// Route to get QR code for a short link
+router.get('/:id/qrcode', getQRCode);
 
 // Route to update a short link
 router.put('/:id', authMiddleware, updateShortUrl);

@@ -44,3 +44,6 @@ export const getUrlAnalytics = (id: string, token: string) =>
   axios.get(`${API_BASE}/analytics/${id}/clicks`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+
+export const getQRCode = (id: string) =>
+  axios.get(`${API_BASE}/urls/${id}/qrcode`);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import AuthForm from './components/AuthForm';
 import ShortenUrlForm from './components/ShortenUrlForm';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -9,6 +10,8 @@ import type { UrlItem } from './components/UrlList';
 import AnalyticsModal from './components/AnalyticsModal';
 import { register, login, shortenUrl, getAnalytics, updateUrl, deleteUrl, getUrlAnalytics } from './services/api';
 import type { AxiosError } from 'axios';
+import ShortUrlCard from './components/ShortUrlCard';
+import Hero from './components/Hero';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -16,9 +19,6 @@ const App: React.FC = () => {
   const [authError, setAuthError] = useState<string | null>(null);
   const [shortenLoading, setShortenLoading] = useState(false);
   const [shortenError, setShortenError] = useState<string | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsItem[]>([]);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
-  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // New state for user's URLs
@@ -140,32 +140,33 @@ const App: React.FC = () => {
     }
   }, [token]);
 
-  // Fetch analytics
-  const fetchAnalytics = useCallback(async () => {
-    setAnalyticsLoading(true);
-    setAnalyticsError(null);
-    try {
+  const queryClient = useQueryClient();
+
+  // Use React Query for analytics
+  const {
+    data: analyticsData = [],
+    isLoading: analyticsLoading,
+    isError: analyticsIsError,
+    error: analyticsErrorObj,
+    refetch: refetchAnalytics,
+  } = useQuery({
+    queryKey: ['analytics', token],
+    queryFn: async () => {
       if (!token) throw new Error('Not authenticated');
       const res = await getAnalytics(token);
-      setAnalytics(res.data as AnalyticsItem[]);
-    } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as AxiosError<{ message?: string }>;
-        setAnalyticsError(axiosErr.response?.data?.message || 'Failed to load analytics');
-      } else {
-        setAnalyticsError('Failed to load analytics');
-      }
-    } finally {
-      setAnalyticsLoading(false);
-    }
-  }, [token]);
+      return res.data as AnalyticsItem[];
+    },
+    enabled: !!token,
+    refetchInterval: 3000, // background refetch every 3s
+    staleTime: 5000, // cache for 5s
+    refetchOnWindowFocus: true,
+  });
 
   useEffect(() => {
     if (token) {
-      fetchAnalytics();
       fetchUserUrls();
     }
-  }, [token, fetchAnalytics, fetchUserUrls]);
+  }, [token, fetchUserUrls]);
 
   const handleAuth = async (
     type: 'login' | 'register',
@@ -196,14 +197,18 @@ const App: React.FC = () => {
     }
   };
 
+  const [lastShortUrl, setLastShortUrl] = useState<{ shortId: string; originalUrl: string } | null>(null);
+
   const handleShorten = async (data: { originalUrl: string; customAlias?: string; expiration?: string }) => {
     setShortenLoading(true);
     setShortenError(null);
     try {
       if (!token) throw new Error('Not authenticated');
-      await shortenUrl(data, token);
+      const res = await shortenUrl(data, token);
+      const shortData = (res.data as { data: { shortId: string; originalUrl: string } }).data;
       setSuccessMsg('Short URL created!');
-      fetchAnalytics();
+      setLastShortUrl({ shortId: shortData.shortId, originalUrl: shortData.originalUrl });
+      refetchAnalytics();
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
@@ -220,7 +225,7 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setToken(null);
     localStorage.removeItem('token');
-    setAnalytics([]);
+    queryClient.clear();
     setUrls([]);
     setSuccessMsg(null);
   };
@@ -233,16 +238,24 @@ const App: React.FC = () => {
     }
   }, [successMsg]);
 
+  const formRef = React.useRef<HTMLDivElement>(null);
+  const handleHeroShortenClick = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-900 text-white transition-colors duration-500">
       <Navbar isAuthenticated={!!token} onLogout={handleLogout} />
+      <Hero onShortenClick={handleHeroShortenClick} />
       <div className="container mx-auto px-4 py-8">
         {!token ? (
           <AuthForm onAuth={handleAuth} loading={authLoading} error={authError} />
         ) : (
           <>
+            <div ref={formRef} />
             <ShortenUrlForm onShorten={handleShorten} loading={shortenLoading} error={shortenError} />
-            {successMsg && <div className="text-green-600 text-center mt-4">{successMsg}</div>}
+            {lastShortUrl && <ShortUrlCard shortId={lastShortUrl.shortId} originalUrl={lastShortUrl.originalUrl} />}
+            {successMsg && <div className="text-green-400 text-center mt-4 font-bold animate-fade-in">{successMsg}</div>}
             <UrlList
               urls={urls}
               onCopy={handleCopy}
@@ -252,7 +265,7 @@ const App: React.FC = () => {
               loading={urlsLoading}
               error={urlsError}
             />
-            <AnalyticsDashboard analytics={analytics} loading={analyticsLoading} error={analyticsError} />
+            <AnalyticsDashboard analytics={analyticsData as AnalyticsItem[]} loading={analyticsLoading} error={analyticsIsError ? (analyticsErrorObj as Error).message : null} />
             <AnalyticsModal
               open={modalOpen}
               onClose={closeModal}

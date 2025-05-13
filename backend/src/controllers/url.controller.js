@@ -1,6 +1,7 @@
 import URL from '../models/url.model.js';
 import { nanoid } from 'nanoid';
 import { hasExpired } from '../utils/expiration.util.js';
+import QRCode from 'qrcode';
 
 // Create a shortened URL with optional custom alias and expiration
 export const createShortUrl = async (req, res) => {
@@ -86,6 +87,7 @@ export const updateShortUrl = async (req, res) => {
         res.status(500).json({ message: 'Error updating short URL', error });
     }
 };
+
 // Delete a shortened URL
 export const deleteShortLink = async (req, res) => {
     const { id } = req.params;
@@ -97,5 +99,21 @@ export const deleteShortLink = async (req, res) => {
         res.status(200).json({ message: 'Short URL deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting short URL', error });
+    }
+};
+
+// Generate QR code for a short URL
+export const getQRCode = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const urlEntry = await URL.findOne({ shortId: id });
+        if (!urlEntry) {
+            return res.status(404).json({ message: 'Short URL not found' });
+        }
+        const shortUrl = `http://localhost:5000/api/urls/${urlEntry.shortId}`;
+        const qrDataUrl = await QRCode.toDataURL(shortUrl);
+        res.status(200).json({ qrCode: qrDataUrl });
+    } catch (error) {
+        res.status(500).json({ message: 'Error generating QR code', error });
     }
 };
