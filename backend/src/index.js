@@ -17,10 +17,10 @@ app.set('trust proxy', 1);
 const PORT = appConfig.PORT || 5000;
 
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from your frontend
+    origin: [/^http:\/\/localhost:\d+$/], // Allow all localhost ports
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true, // If using cookies or authorization headers
-  }));
+}));
   
 app.use(express.json());
 app.use(rateLimiter);
