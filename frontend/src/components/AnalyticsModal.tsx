@@ -25,16 +25,16 @@ const AnalyticsModal: React.FC<AnalyticsModalProps> = ({ open, onClose, shortId,
           <table className="w-full text-sm">
             <thead>
               <tr>
-                <th className="border-b p-2 text-left">Click Timestamp</th>
+                <th className="border-b p-2 text-left text-amber-400">Click Timestamp</th>
               </tr>
             </thead>
             <tbody>
               {clickHistory.length === 0 ? (
-                <tr><td className="p-2 text-center text-gray-400">No clicks yet.</td></tr>
+                <tr><td className="p-2 text-center text-red-700">No clicks yet.</td></tr>
               ) : (
                 clickHistory.map((item, idx) => (
                   <tr key={idx}>
-                    <td className="p-2">{new Date(item.timestamp).toLocaleString()}</td>
+                    <td className="p-2 text-red-700">{`👆 No  ${idx+1} On ${new Date(item.timestamp).toLocaleString()}`}</td>
                   </tr>
                 ))
               )}
