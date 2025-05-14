@@ -18,9 +18,9 @@ const getAnalyticsData = async (shortId) => {
     }
 };
 
-const getAllAnalytics = async () => {
+const getAllAnalytics = async (userId) => {
     try {
-        const urls = await Url.find({});
+        const urls = await Url.find({ user: userId });
         return urls.map(url => ({
             originalUrl: url.originalUrl,
             shortId: url.shortId,

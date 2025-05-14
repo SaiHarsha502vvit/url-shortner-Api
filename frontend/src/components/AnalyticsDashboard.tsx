@@ -25,6 +25,8 @@ const shimmer = (
 );
 
 const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ analytics, loading, error, onAnalytics }) => {
+  // Ensure analytics is always an array
+  const safeAnalytics = Array.isArray(analytics) ? analytics : [];
   return (
     <div className="max-w-3xl mx-auto mt-10 p-8 bg-gradient-to-br from-black via-gray-900 to-red-900 rounded-2xl shadow-2xl border border-red-700 text-white">
       <h2 className="text-3xl font-extrabold mb-8 text-center text-red-400 tracking-tight drop-shadow-lg">Analytics</h2>
@@ -32,11 +34,11 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ analytics, load
         <div className="space-y-2">{Array.from({ length: 3 }).map((_, i) => <div key={i}>{shimmer}</div>)}</div>
       )}
       {error && <div className="text-red-500 text-center mb-4 font-semibold animate-pulse">{error}</div>}
-      {!loading && !error && analytics.length > 0 && (
+      {!loading && !error && safeAnalytics.length > 0 && (
         <>
           <div className="w-full h-72 mb-8 bg-black bg-opacity-60 rounded-xl p-4 flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+              <BarChart data={safeAnalytics} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#222" />
                 <XAxis dataKey="shortId" stroke="#fff" tick={{ fill: '#fff', fontWeight: 700 }} />
                 <YAxis stroke="#fff" tick={{ fill: '#fff', fontWeight: 700 }} allowDecimals={false} />
@@ -58,7 +60,7 @@ const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ analytics, load
                 </tr>
               </thead>
               <tbody>
-                {analytics.map((item) => (
+                {safeAnalytics.map((item) => (
                   <tr
                     key={item.shortId}
                     className="hover:bg-gray-800 transition-colors duration-200"

@@ -8,9 +8,10 @@ import Navbar from './components/Navbar';
 import UrlList from './components/UrlList';
 import type { UrlItem } from './components/UrlList';
 import AnalyticsModal from './components/AnalyticsModal';
-import { register, login, shortenUrl, getAnalytics, updateUrl, deleteUrl, getUrlAnalytics } from './services/api';
+import { register, login, shortenUrl, getAnalytics, updateUrl, deleteUrl, getUrlAnalytics, getUserUrls } from './services/api';
 import ShortUrlCard from './components/ShortUrlCard';
 import Hero from './components/Hero';
+import { isTokenExpired } from './services/jwt';
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -33,6 +34,18 @@ const App: React.FC = () => {
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
 
+  const [forceLogin, setForceLogin] = useState(false);
+  const [registrationMsg, setRegistrationMsg] = useState<string | null>(null);
+
+  const setAuthToken = (tokenValue: string | null) => {
+    setToken(tokenValue);
+    if (tokenValue) {
+      localStorage.setItem('token', tokenValue);
+    } else {
+      localStorage.removeItem('token');
+    }
+  };
+
   // Update modal state (simple prompt for now)
   const handleUpdate = async (url: UrlItem) => {
     const newOriginalUrl = prompt('Update original URL:', url.originalUrl);
@@ -46,7 +59,7 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setUrlsError(axiosErr?.response?.data?.message || 'Failed to update URL');
       } else {
         setUrlsError('Failed to update URL');
@@ -68,7 +81,7 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setUrlsError(axiosErr?.response?.data?.message || 'Failed to delete URL');
       } else {
         setUrlsError('Failed to delete URL');
@@ -99,7 +112,7 @@ const App: React.FC = () => {
       setModalClickHistory(data.clickHistory || []);
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setModalError(axiosErr?.response?.data?.message || 'Failed to load analytics');
       } else {
         setModalError('Failed to load analytics');
@@ -123,13 +136,12 @@ const App: React.FC = () => {
     setUrlsError(null);
     try {
       if (!token) throw new Error('Not authenticated');
-      // For demo, reuse analytics endpoint as backend does not have /urls GET for user
-      const res = await getAnalytics(token);
-      const data = res.data as AnalyticsItem[];
-      setUrls(data.map((item) => ({ ...item, _id: item.shortId })));
+      const res = await getUserUrls(token); // Use getUserUrls for user-specific URLs
+      const data = res.data as UrlItem[];
+      setUrls(data);
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setUrlsError(axiosErr?.response?.data?.message || 'Failed to load URLs');
       } else {
         setUrlsError('Failed to load URLs');
@@ -167,6 +179,13 @@ const App: React.FC = () => {
     }
   }, [token, fetchUserUrls]);
 
+  useEffect(() => {
+    if (token && isTokenExpired(token)) {
+      handleLogout();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
   const handleAuth = async (
     type: 'login' | 'register',
     data: { username: string; password: string; email?: string }
@@ -176,17 +195,20 @@ const App: React.FC = () => {
     try {
       if (type === 'register') {
         await register(data);
-        setSuccessMsg('Registration successful! Please log in.');
+        setRegistrationMsg('Registration successful! Please log in.');
+        setForceLogin(true);
+        setSuccessMsg(null);
       } else {
         const res = await login(data);
         const tokenValue = (res.data as { token: string }).token;
-        setToken(tokenValue);
-        localStorage.setItem('token', tokenValue);
+        setAuthToken(tokenValue);
         setSuccessMsg(null);
+        setRegistrationMsg(null);
+        setForceLogin(false);
       }
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setAuthError(axiosErr?.response?.data?.message || 'Authentication failed');
       } else {
         setAuthError('Authentication failed');
@@ -211,7 +233,7 @@ const App: React.FC = () => {
       fetchUserUrls();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'isAxiosError' in err) {
-        const axiosErr = err as any;
+        const axiosErr = err as { response?: { data?: { message?: string } } };
         setShortenError(axiosErr?.response?.data?.message || 'Failed to shorten URL');
       } else {
         setShortenError('Failed to shorten URL');
@@ -222,11 +244,12 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    setToken(null);
-    localStorage.removeItem('token');
+    setAuthToken(null);
     queryClient.clear();
     setUrls([]);
     setSuccessMsg(null);
+    setRegistrationMsg(null);
+    setForceLogin(false);
   };
 
   // Notification auto-dismiss
@@ -242,13 +265,25 @@ const App: React.FC = () => {
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Keep token in sync with localStorage (handles manual localStorage changes)
+  useEffect(() => {
+    const syncToken = () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken !== token) {
+        setToken(storedToken);
+      }
+    };
+    window.addEventListener('storage', syncToken);
+    return () => window.removeEventListener('storage', syncToken);
+  }, [token]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-900 text-white transition-colors duration-500">
       <Navbar isAuthenticated={!!token} onLogout={handleLogout} />
       <Hero onShortenClick={handleHeroShortenClick} />
       <div className="container mx-auto px-4 py-8">
         {!token ? (
-          <AuthForm onAuth={handleAuth} loading={authLoading} error={authError} />
+          <AuthForm onAuth={handleAuth} loading={authLoading} error={authError} forceLogin={forceLogin} registrationMsg={registrationMsg} />
         ) : (
           <>
             <div ref={formRef} />

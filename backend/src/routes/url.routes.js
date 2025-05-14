@@ -1,5 +1,5 @@
 import express from 'express';
-import { createShortUrl, getOriginalUrl, deleteShortLink, updateShortUrl, getQRCode } from '../controllers/url.controller.js';
+import { createShortUrl, getOriginalUrl, deleteShortLink, updateShortUrl, getQRCode, getUserUrls } from '../controllers/url.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import rateLimiter from '../middlewares/rateLimiter.middleware.js';
 
@@ -7,6 +7,9 @@ const router = express.Router();
 
 // Route to create a new short link
 router.post('/', authMiddleware, rateLimiter, createShortUrl);
+
+// Route to get all URLs for the authenticated user
+router.get('/', authMiddleware, getUserUrls);
 
 // Route to retrieve the original URL from a short link
 router.get('/:id', getOriginalUrl);

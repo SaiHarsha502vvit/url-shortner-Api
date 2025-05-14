@@ -15,10 +15,10 @@ export const getClickStats = async (req, res) => {
     }
 };
 
-// Get overall analytics data
+// Get overall analytics data (for the authenticated user only)
 export const getAnalytics = async (req, res) => {
     try {
-        const overallData = await getAllAnalytics();
+        const overallData = await getAllAnalytics(req.user._id);
         res.status(200).json(overallData);
     } catch (error) {
         res.status(500).json({ message: 'Error retrieving overall analytics', error: error.message });

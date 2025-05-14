@@ -30,12 +30,18 @@ const urlSchema = new mongoose.Schema({
             type: Date,
             default: Date.now
         }
-    }],updateHistory: [{
+    }],
+    updateHistory: [{
         originalUrl: String,
         shortId: String,
         expirationDate: Date,
         updatedAt: { type: Date, default: Date.now }
-    }]
+    }],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
 const Url = mongoose.model('Url', urlSchema);

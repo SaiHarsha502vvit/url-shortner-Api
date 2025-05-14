@@ -8,7 +8,7 @@ export const createShortUrl = async (req, res) => {
     const { originalUrl, customAlias, expiration } = req.body;
 
     try {
-        const existingUrl = await URL.findOne({ originalUrl });
+        const existingUrl = await URL.findOne({ originalUrl, user: req.user._id });
         if (existingUrl) {
             return res.status(400).json({ message: 'URL already exists', data: existingUrl });
         }
@@ -18,7 +18,8 @@ export const createShortUrl = async (req, res) => {
             originalUrl,
             shortId,
             expirationDate: expiration ? new Date(expiration) : null,
-            clickHistory: []
+            clickHistory: [],
+            user: req.user._id // associate with user
         });
 
         await newUrl.save();
@@ -115,5 +116,15 @@ export const getQRCode = async (req, res) => {
         res.status(200).json({ qrCode: qrDataUrl });
     } catch (error) {
         res.status(500).json({ message: 'Error generating QR code', error });
+    }
+};
+
+// Get all URLs for the authenticated user
+export const getUserUrls = async (req, res) => {
+    try {
+        const urls = await URL.find({ user: req.user._id });
+        res.status(200).json(urls);
+    } catch (error) {
+        res.status(500).json({ message: 'Error retrieving user URLs', error });
     }
 };

@@ -1,16 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AuthFormProps {
   onAuth: (type: 'login' | 'register', data: { username: string; password: string; email?: string }) => void;
   loading: boolean;
   error: string | null;
+  forceLogin?: boolean;
+  registrationMsg?: string | null;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
+const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error, forceLogin = false, registrationMsg = null }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+
+  // Switch to login mode if forceLogin is true
+  useEffect(() => {
+    if (forceLogin) setIsLogin(true);
+  }, [forceLogin]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +31,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ onAuth, loading, error }) => {
   return (
     <div className="max-w-md mx-auto mt-10 p-8 bg-white rounded shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center text-black drop-shadow-lg">{isLogin ? 'Login' : 'Register'}</h2>
+      {registrationMsg && isLogin && (
+        <div className="text-green-600 text-center mb-4 font-semibold">{registrationMsg}</div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           className="w-full px-4 py-2 border rounded focus:outline-none focus:ring bg-white text-black placeholder-gray-400"
