@@ -2,9 +2,14 @@ import URL from '../models/url.model.js';
 import { nanoid } from 'nanoid';
 import { hasExpired } from '../utils/expiration.util.js';
 import QRCode from 'qrcode';
+import { validationResult } from 'express-validator';
 
 // Create a shortened URL with optional custom alias and expiration
 export const createShortUrl = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     const { originalUrl, customAlias, expiration } = req.body;
 
     try {

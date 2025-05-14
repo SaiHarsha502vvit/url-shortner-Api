@@ -8,7 +8,9 @@ import analyticsRoutes from './routes/analytics.routes.js';
 import rateLimiter from './middlewares/rateLimiter.middleware.js';
 import { authenticate } from './controllers/auth.controller.js';
 import connectToDatabase from './config/db.config.js';
-import cors from 'cors'
+import cors from 'cors';
+import helmet from 'helmet';
+
 dotenv.config();
 const app = express();
 
@@ -31,7 +33,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
-  
+
+app.use(helmet());
 app.use(express.json());
 app.use(rateLimiter);
 
@@ -44,6 +47,15 @@ app.use('/api/analytics', authenticate, analyticsRoutes);
 
 // Connect to database then start server
 connectToDatabase();
+
+// Centralized error handler (should be after all routes)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Internal Server Error'
+    // Do not expose stack in production
+  });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
