@@ -250,6 +250,12 @@ const App: React.FC = () => {
     setSuccessMsg(null);
     setRegistrationMsg(null);
     setForceLogin(false);
+    setLastShortUrl(null); // Clear lastShortUrl on logout
+    setModalOpen(false);
+    setModalShortId('');
+    setModalOriginalUrl('');
+    setModalClickHistory([]);
+    setModalError(null);
   };
 
   // Notification auto-dismiss
