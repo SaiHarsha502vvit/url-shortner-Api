@@ -24,7 +24,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (
       /^http:\/\/localhost:\d+$/.test(origin) ||
-      origin === "https://live-url-shortner.netlify.app"
+      origin === "https://urlshortner.alasaiharsha.me/"
     ) {
       return callback(null, true);
     }
