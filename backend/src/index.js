@@ -23,7 +23,7 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
     if (
-      /^http:\/\/localhost:\d+$/.test(origin) ||
+      /^https?:\/\/localhost:\d+$/.test(origin) ||
       origin === "https://urlshortner.alasaiharsha.me/"
     ) {
       return callback(null, true);
