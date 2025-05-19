@@ -24,7 +24,7 @@ app.use(cors({
     if (!origin) return callback(null, true);
     if (
       /^https?:\/\/localhost:\d+$/.test(origin) ||
-      origin === "https://urlshortner.alasaiharsha.me/"
+      origin === "https://urlshortner.alasaiharsha.me"
     ) {
       return callback(null, true);
     }
