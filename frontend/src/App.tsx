@@ -12,6 +12,7 @@ import { register, login, shortenUrl, getAnalytics, updateUrl, deleteUrl, getUrl
 import ShortUrlCard from './components/ShortUrlCard';
 import Hero from './components/Hero';
 import { isTokenExpired } from './services/jwt';
+import DomainManager from './components/DomainManager'; // Import DomainManager
 
 const App: React.FC = () => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
@@ -33,6 +34,8 @@ const App: React.FC = () => {
   const [modalClickHistory, setModalClickHistory] = useState<{ timestamp: string }[]>([]);
   const [modalLoading, setModalLoading] = useState(false);
   const [modalError, setModalError] = useState<string | null>(null);
+
+  const [showDomainManager, setShowDomainManager] = useState(false); // New state for DomainManager visibility
 
   const [forceLogin, setForceLogin] = useState(false);
   const [registrationMsg, setRegistrationMsg] = useState<string | null>(null);
@@ -285,27 +288,33 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-900 text-white transition-colors duration-500">
-      <Navbar isAuthenticated={!!token} onLogout={handleLogout} />
+      <Navbar isAuthenticated={!!token} onLogout={handleLogout} onShowDomainManager={() => setShowDomainManager(true)} />
       <Hero onShortenClick={handleHeroShortenClick} />
       <div className="container mx-auto px-4 py-8">
         {!token ? (
           <AuthForm onAuth={handleAuth} loading={authLoading} error={authError} forceLogin={forceLogin} registrationMsg={registrationMsg} />
         ) : (
           <>
-            <div ref={formRef} />
-            <ShortenUrlForm onShorten={handleShorten} loading={shortenLoading} error={shortenError} />
-            {lastShortUrl && <ShortUrlCard shortId={lastShortUrl.shortId} originalUrl={lastShortUrl.originalUrl} />}
-            {successMsg && <div className="text-green-400 text-center mt-4 font-bold animate-fade-in">{successMsg}</div>}
-            <UrlList
-              urls={urls}
-              onCopy={handleCopy}
-              onDelete={handleDelete}
-              onUpdate={handleUpdate}
-              onAnalytics={handleAnalytics}
-              loading={urlsLoading}
-              error={urlsError}
-            />
-            <AnalyticsDashboard analytics={analyticsData as AnalyticsItem[]} loading={analyticsLoading} error={analyticsIsError ? (analyticsErrorObj as Error).message : null} />
+            {showDomainManager ? (
+              <DomainManager token={token as string} onClose={() => setShowDomainManager(false)} />
+            ) : (
+              <>
+                <div ref={formRef} />
+                <ShortenUrlForm onShorten={handleShorten} loading={shortenLoading} error={shortenError} />
+                {lastShortUrl && <ShortUrlCard shortId={lastShortUrl.shortId} originalUrl={lastShortUrl.originalUrl} />}
+                {successMsg && <div className="text-green-400 text-center mt-4 font-bold animate-fade-in">{successMsg}</div>}
+                <UrlList
+                  urls={urls}
+                  onCopy={handleCopy}
+                  onDelete={handleDelete}
+                  onUpdate={handleUpdate}
+                  onAnalytics={handleAnalytics}
+                  loading={urlsLoading}
+                  error={urlsError}
+                />
+                <AnalyticsDashboard analytics={analyticsData as AnalyticsItem[]} loading={analyticsLoading} error={analyticsIsError ? (analyticsErrorObj as Error).message : null} />
+              </>
+            )}
             <AnalyticsModal
               open={modalOpen}
               onClose={closeModal}

@@ -5,15 +5,52 @@ import appConfig from '../config/app.config.js';
 
 // Register a new user
 export const register = async (req, res) => {
-    const { username, email, password } = req.body; // include email here
+    const { username, email, password } = req.body;
 
     try {
+        console.time('bcryptHash');
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ username, email, password: hashedPassword }); // pass email to the model
+        console.timeEnd('bcryptHash');
+
+        const newUser = new User({ username, email, password: hashedPassword });
+        
+        console.time('userSave');
         await newUser.save();
+        console.timeEnd('userSave');
+
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        res.status(500).json({ message: 'User already exists ', error });
+        console.error("Registration error:", error); // Log the actual error
+
+        if (error.code === 11000) { // MongoDB duplicate key error
+            let field = Object.keys(error.keyValue)[0];
+            const displayField = field.charAt(0).toUpperCase() + field.slice(1);
+            return res.status(409).json({ 
+                message: `${displayField} already exists. Please choose a different ${field.toLowerCase()}.`,
+                errorType: 'DuplicateKey',
+                field: field.toLowerCase()
+            });
+        }
+
+        if (error.name === 'ValidationError') {
+            const validationErrors = {};
+            for (const fieldKey in error.errors) {
+                validationErrors[fieldKey] = error.errors[fieldKey].message;
+            }
+            return res.status(400).json({
+                message: 'Validation failed. Please check the data you provided.',
+                errorType: 'ValidationError',
+                errors: validationErrors
+            });
+        }
+        
+        // For other errors, send a generic message
+        res.status(500).json({ 
+            message: 'Error registering user. An unexpected error occurred on our end. Please try again later.',
+            errorType: 'InternalServerError',
+            // For debugging in development, you might want to include more details:
+            // detail: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
     }
 };
 
